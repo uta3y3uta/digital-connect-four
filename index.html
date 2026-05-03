@@ -7,7 +7,7 @@
 <title>デジタル コネクトフォー</title>
 <style>
   :root {
-    --bg: #fef3c7;
+    --bg: #fbbf24;
     --board: #1e3a8a;
     --board-dark: #1e293b;
     --cell-empty: #fefce8;
@@ -20,7 +20,7 @@
     --btn-secondary-hover: #e2e8f0;
     --btn-danger: #ef4444;
     --highlight: #10b981;
-    --shadow: rgba(15, 23, 42, 0.1);
+    --shadow: rgba(15, 23, 42, 0.15);
     --review: #fef3c7;
     --review-text: #92400e;
     --plus: #15803d;
@@ -179,6 +179,109 @@
     transition: background 0.15s;
   }
   .arrange-start:hover { background: var(--board-dark); }
+
+  /* アレンジ ライブプレビュー */
+  .arrange-preview {
+    margin-top: 4px;
+    padding: 8px;
+    background: #f8fafc;
+    border: 1px dashed #94a3b8;
+    border-radius: 12px;
+  }
+  .arrange-preview .preview-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+  .preview-svg {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    display: block;
+  }
+
+  /* CPU 戦セクション */
+  .cpu-section {
+    width: min(520px, 94vw);
+    background: var(--card);
+    border: 2px solid #38bdf8;
+    border-radius: 16px;
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 2px 6px var(--shadow);
+  }
+  .cpu-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .cpu-title {
+    font-weight: 800;
+    font-size: 15px;
+    color: #0369a1;
+  }
+  .cpu-title .robo {
+    font-size: 18px;
+    margin-right: 4px;
+  }
+  .diff-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .diff-row .diff-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  .diff-btn {
+    padding: 7px 14px;
+    border: 2px solid #cbd5e1;
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.12s;
+    letter-spacing: 0.04em;
+  }
+  .diff-btn.selected {
+    background: #0ea5e9;
+    color: white;
+    border-color: #0ea5e9;
+    box-shadow: 0 2px 6px rgba(14, 165, 233, 0.35);
+  }
+  .diff-btn:hover:not(.selected) {
+    background: var(--btn-secondary);
+  }
+  .cpu-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .cpu-thinking-tag {
+    background: #38bdf8;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    animation: pulse 0.8s infinite alternate;
+  }
+  @keyframes pulse {
+    from { opacity: 0.55; }
+    to { opacity: 1; }
+  }
 
   /* 配色テーマ選択 */
   .theme-section {
@@ -481,29 +584,29 @@
   const EMPTY = -1;
   const BLOCKED = -2;
 
-  // ----- 配色テーマ（10種） -----
+  // ----- 配色テーマ（10種・全て背景色が異なる） -----
   // pieces[0..n-1] が各プレイヤーの色（最大8人想定）
   const THEMES = [
-    { name: 'クリーム×白対赤',  bg: '#fef3c7', board: '#1e3a8a', cell: '#fefce8', text: '#451a03',
-      pieces: ['#ffffff', '#dc2626', '#2563eb', '#facc15', '#22c55e', '#a855f7', '#f97316', '#0f172a'] },
-    { name: 'クリーム×黄対赤',  bg: '#fef3c7', board: '#1e3a8a', cell: '#fefce8', text: '#451a03',
-      pieces: ['#facc15', '#dc2626', '#ffffff', '#2563eb', '#22c55e', '#a855f7', '#f97316', '#0f172a'] },
-    { name: 'クリーム×黒対赤',  bg: '#fef3c7', board: '#78716c', cell: '#fefce8', text: '#451a03',
-      pieces: ['#0f172a', '#dc2626', '#ffffff', '#facc15', '#2563eb', '#22c55e', '#a855f7', '#f97316'] },
-    { name: 'クリーム×紺対橙',  bg: '#fef3c7', board: '#7c2d12', cell: '#fefce8', text: '#451a03',
-      pieces: ['#1e3a8a', '#f97316', '#ffffff', '#facc15', '#22c55e', '#dc2626', '#a855f7', '#0f172a'] },
-    { name: 'クリーム×桃対水',  bg: '#fef3c7', board: '#7c3aed', cell: '#fefce8', text: '#451a03',
-      pieces: ['#ec4899', '#06b6d4', '#facc15', '#22c55e', '#dc2626', '#a855f7', '#f97316', '#ffffff'] },
-    { name: '空色×白対赤',      bg: '#dbeafe', board: '#1e40af', cell: '#ffffff', text: '#1e293b',
-      pieces: ['#ffffff', '#dc2626', '#facc15', '#22c55e', '#7c3aed', '#f97316', '#0ea5e9', '#0f172a'] },
-    { name: '若草×白対赤',      bg: '#dcfce7', board: '#15803d', cell: '#ffffff', text: '#14532d',
-      pieces: ['#ffffff', '#dc2626', '#facc15', '#7c3aed', '#0ea5e9', '#f97316', '#0f172a', '#ec4899'] },
-    { name: '桜×白対赤',        bg: '#fce7f3', board: '#be185d', cell: '#ffffff', text: '#831843',
-      pieces: ['#ffffff', '#dc2626', '#facc15', '#7c3aed', '#0ea5e9', '#22c55e', '#f97316', '#0f172a'] },
-    { name: 'ライト×黒対赤',    bg: '#f1f5f9', board: '#334155', cell: '#ffffff', text: '#0f172a',
-      pieces: ['#0f172a', '#dc2626', '#0ea5e9', '#facc15', '#22c55e', '#a855f7', '#f97316', '#ffffff'] },
-    { name: 'ダーク×白対赤',    bg: '#1e293b', board: '#0f172a', cell: '#334155', text: '#f1f5f9',
-      pieces: ['#ffffff', '#ef4444', '#facc15', '#22c55e', '#06b6d4', '#a855f7', '#fb923c', '#fbbf24'] },
+    { name: 'ゴールド',    bg: '#fbbf24', board: '#1e3a8a', cell: '#fefce8', text: '#451a03',
+      pieces: ['#ffffff', '#dc2626', '#2563eb', '#15803d', '#7c3aed', '#f97316', '#0f172a', '#ec4899'] },
+    { name: 'ネイビー',    bg: '#1e3a8a', board: '#fbbf24', cell: '#fef3c7', text: '#f1f5f9',
+      pieces: ['#ffffff', '#dc2626', '#0ea5e9', '#22c55e', '#a855f7', '#f97316', '#0f172a', '#ec4899'] },
+    { name: 'ミント',      bg: '#a7f3d0', board: '#065f46', cell: '#ecfdf5', text: '#064e3b',
+      pieces: ['#ffffff', '#dc2626', '#facc15', '#0ea5e9', '#a855f7', '#f97316', '#0f172a', '#ec4899'] },
+    { name: 'ピーチ',      bg: '#fed7aa', board: '#7c2d12', cell: '#fff7ed', text: '#431407',
+      pieces: ['#ffffff', '#0f172a', '#dc2626', '#facc15', '#22c55e', '#0ea5e9', '#a855f7', '#ec4899'] },
+    { name: 'ラベンダー',  bg: '#ddd6fe', board: '#5b21b6', cell: '#f5f3ff', text: '#3b0764',
+      pieces: ['#ffffff', '#facc15', '#dc2626', '#22c55e', '#0ea5e9', '#f97316', '#0f172a', '#ec4899'] },
+    { name: 'シアン',      bg: '#67e8f9', board: '#155e75', cell: '#ecfeff', text: '#083344',
+      pieces: ['#ffffff', '#dc2626', '#facc15', '#22c55e', '#a855f7', '#f97316', '#0f172a', '#ec4899'] },
+    { name: 'チェリー',    bg: '#fda4af', board: '#9f1239', cell: '#fff1f2', text: '#4c0519',
+      pieces: ['#ffffff', '#1e3a8a', '#facc15', '#22c55e', '#0ea5e9', '#a855f7', '#0f172a', '#f97316'] },
+    { name: 'モス',        bg: '#bef264', board: '#3f6212', cell: '#f7fee7', text: '#1a2e05',
+      pieces: ['#ffffff', '#dc2626', '#0f172a', '#0ea5e9', '#a855f7', '#f97316', '#facc15', '#ec4899'] },
+    { name: 'シルバー',    bg: '#cbd5e1', board: '#1e293b', cell: '#ffffff', text: '#0f172a',
+      pieces: ['#ffffff', '#dc2626', '#facc15', '#22c55e', '#0ea5e9', '#a855f7', '#f97316', '#0f172a'] },
+    { name: 'ナイト',      bg: '#0f172a', board: '#475569', cell: '#1e293b', text: '#f8fafc',
+      pieces: ['#ffffff', '#ef4444', '#fbbf24', '#34d399', '#22d3ee', '#c084fc', '#fb923c', '#f472b6'] },
   ];
 
   // ----- フィールドサイズ・人数の選択肢 -----
@@ -518,13 +621,19 @@
   ];
 
   const PLAYER_COUNTS = [
-    { label: '1対1（2人）',       value: 2 },
-    { label: '三つ巴戦（3人）',   value: 3 },
-    { label: '四つ巴戦（4人）',   value: 4 },
-    { label: '5人',               value: 5 },
-    { label: '6人',               value: 6 },
-    { label: '7人',               value: 7 },
-    { label: '8人',               value: 8 },
+    { label: '2人', value: 2 },
+    { label: '3人', value: 3 },
+    { label: '4人', value: 4 },
+    { label: '5人', value: 5 },
+    { label: '6人', value: 6 },
+    { label: '7人', value: 7 },
+    { label: '8人', value: 8 },
+  ];
+
+  const DIFFICULTIES = [
+    { value: 'easy',   label: 'EASY',   desc: 'ランダムに置く' },
+    { value: 'normal', label: 'NORMAL', desc: '勝ち手・防ぎ手は読む' },
+    { value: 'hard',   label: 'HARD',   desc: '数手先まで読む' },
   ];
 
   // ----- 状態 -----
@@ -538,12 +647,23 @@
       isPoint: false,
       isBumpy: false,
     },
+    cpuConfig: {
+      enabled: false,
+      difficulty: 'normal',    // 'easy' | 'normal' | 'hard'
+    },
+    // アレンジパネルのライブプレビュー用キャッシュ
+    preview: {
+      signature: '',
+      blockedSet: null,
+      pointGrid: null,
+    },
     // ゲーム中データ（startGameで設定）
     game: null,
     history: [],
     cursor: 0,
     showOverlay: false,
     lastAnimateIndex: -1,
+    cpuThinking: false,
   };
 
   // ----- localStorage（テーマだけ保持） -----
@@ -569,13 +689,20 @@
   // ----- 盤面生成 -----
 
   function genBlockedCells(rows, cols) {
+    // 障害マスは盤面のどこにも配置可能（通り抜け仕様のため）
+    // 列が完全に塞がれないよう，1列につき (rows - 1) 個まで
     const cells = new Set();
-    const targetCount = Math.max(2, Math.floor(rows * cols * 0.07));
-    let safety = 100;
+    const targetCount = Math.max(2, Math.floor(rows * cols * 0.08));
+    const perColCount = new Array(cols).fill(0);
+    let safety = 200;
     while (cells.size < targetCount && safety-- > 0) {
-      const r = 1 + Math.floor(Math.random() * (rows - 1));
+      const r = Math.floor(Math.random() * rows);
       const c = Math.floor(Math.random() * cols);
-      cells.add(r + ',' + c);
+      if (perColCount[c] >= rows - 1) continue;
+      const key = r + ',' + c;
+      if (cells.has(key)) continue;
+      cells.add(key);
+      perColCount[c]++;
     }
     return cells;
   }
@@ -629,10 +756,11 @@
   }
 
   function findLandingRow(board, col, rows) {
-    for (let r = 0; r < rows; r++) {
-      if (board[r][col] !== EMPTY) return r - 1;
+    // 障害マスは通り抜けて，最下段に近い空きマスに着地する
+    for (let r = rows - 1; r >= 0; r--) {
+      if (board[r][col] === EMPTY) return r;
     }
-    return rows - 1;
+    return -1;
   }
 
   function checkWinAt(board, row, col, rows, cols) {
@@ -703,13 +831,154 @@
     return { gameOver, winInfo, board, currentPlayerIdx };
   }
 
+  // ----- CPU AI -----
+
+  // 盤面評価（HARD用）
+  function evaluateBoard(board, rows, cols, cpuIdx, opIdx) {
+    let score = 0;
+    const dirs = [[0,1],[1,0],[1,1],[1,-1]];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        for (const [dr, dc] of dirs) {
+          const cells = [];
+          let ok = true;
+          for (let k = 0; k < 4; k++) {
+            const nr = r + dr*k, nc = c + dc*k;
+            if (nr<0||nr>=rows||nc<0||nc>=cols) { ok = false; break; }
+            cells.push(board[nr][nc]);
+          }
+          if (!ok) continue;
+          let my=0, op=0, em=0;
+          for (const v of cells) {
+            if (v === cpuIdx) my++;
+            else if (v === opIdx) op++;
+            else if (v === EMPTY) em++;
+          }
+          if (my > 0 && op > 0) continue;
+          if (my === 4) score += 100000;
+          else if (my === 3 && em === 1) score += 200;
+          else if (my === 2 && em === 2) score += 20;
+          else if (my === 1 && em === 3) score += 2;
+          if (op === 4) score -= 100000;
+          else if (op === 3 && em === 1) score -= 250;
+          else if (op === 2 && em === 2) score -= 20;
+          else if (op === 1 && em === 3) score -= 2;
+        }
+      }
+    }
+    // 中央寄りを微加点
+    const center = Math.floor(cols / 2);
+    for (let r = 0; r < rows; r++) {
+      if (board[r][center] === cpuIdx) score += 3;
+      else if (board[r][center] === opIdx) score -= 3;
+    }
+    return score;
+  }
+
+  function minimax(board, rows, cols, cpuIdx, opIdx, depth, alpha, beta, maximizing) {
+    if (depth === 0) return evaluateBoard(board, rows, cols, cpuIdx, opIdx);
+    const validCols = [];
+    for (let c = 0; c < cols; c++) if (findLandingRow(board, c, rows) >= 0) validCols.push(c);
+    if (validCols.length === 0) return evaluateBoard(board, rows, cols, cpuIdx, opIdx);
+    const center = Math.floor(cols / 2);
+    validCols.sort((a, b) => Math.abs(a - center) - Math.abs(b - center));
+    const player = maximizing ? cpuIdx : opIdx;
+    if (maximizing) {
+      let value = -Infinity;
+      for (const c of validCols) {
+        const r = findLandingRow(board, c, rows);
+        board[r][c] = player;
+        const win = checkWinAt(board, r, c, rows, cols);
+        const score = win ? (90000 + depth * 10)
+                          : minimax(board, rows, cols, cpuIdx, opIdx, depth - 1, alpha, beta, false);
+        board[r][c] = EMPTY;
+        if (score > value) value = score;
+        if (value > alpha) alpha = value;
+        if (alpha >= beta) break;
+      }
+      return value;
+    } else {
+      let value = Infinity;
+      for (const c of validCols) {
+        const r = findLandingRow(board, c, rows);
+        board[r][c] = player;
+        const win = checkWinAt(board, r, c, rows, cols);
+        const score = win ? -(90000 + depth * 10)
+                          : minimax(board, rows, cols, cpuIdx, opIdx, depth - 1, alpha, beta, true);
+        board[r][c] = EMPTY;
+        if (score < value) value = score;
+        if (value < beta) beta = value;
+        if (alpha >= beta) break;
+      }
+      return value;
+    }
+  }
+
+  function pickCpuMove(board, rows, cols, cpuIdx, numPlayers, difficulty) {
+    const validCols = [];
+    for (let c = 0; c < cols; c++) if (findLandingRow(board, c, rows) >= 0) validCols.push(c);
+    if (validCols.length === 0) return null;
+
+    if (difficulty === 'easy') {
+      return validCols[Math.floor(Math.random() * validCols.length)];
+    }
+
+    // NORMAL/HARD: まず勝てる手を探す
+    for (const c of validCols) {
+      const r = findLandingRow(board, c, rows);
+      board[r][c] = cpuIdx;
+      const win = checkWinAt(board, r, c, rows, cols);
+      board[r][c] = EMPTY;
+      if (win) return c;
+    }
+    // 相手の勝ちを防ぐ
+    for (let p = 0; p < numPlayers; p++) {
+      if (p === cpuIdx) continue;
+      for (const c of validCols) {
+        const r = findLandingRow(board, c, rows);
+        board[r][c] = p;
+        const win = checkWinAt(board, r, c, rows, cols);
+        board[r][c] = EMPTY;
+        if (win) return c;
+      }
+    }
+
+    if (difficulty === 'normal' || numPlayers > 2) {
+      // 中央寄せ＋少しランダム
+      const center = Math.floor(cols / 2);
+      const sorted = validCols.slice().sort((a, b) => Math.abs(a - center) - Math.abs(b - center));
+      const top = sorted.slice(0, Math.min(3, sorted.length));
+      return top[Math.floor(Math.random() * top.length)];
+    }
+
+    // HARD: minimax (盤面サイズで深さ調整)
+    const totalCells = rows * cols;
+    const depth = totalCells <= 24 ? 6 : totalCells <= 42 ? 5 : totalCells <= 56 ? 4 : 3;
+    const opIdx = (cpuIdx + 1) % numPlayers;
+    const work = board.map(row => row.slice());
+    const center = Math.floor(cols / 2);
+    const ordered = validCols.slice().sort((a, b) => Math.abs(a - center) - Math.abs(b - center));
+    let bestScore = -Infinity, bestCols = [];
+    for (const c of ordered) {
+      const r = findLandingRow(work, c, rows);
+      work[r][c] = cpuIdx;
+      const win = checkWinAt(work, r, c, rows, cols);
+      const score = win ? 100000
+                        : minimax(work, rows, cols, cpuIdx, opIdx, depth - 1, -Infinity, Infinity, false);
+      work[r][c] = EMPTY;
+      if (score > bestScore) { bestScore = score; bestCols = [c]; }
+      else if (score === bestScore) { bestCols.push(c); }
+    }
+    return bestCols[Math.floor(Math.random() * bestCols.length)];
+  }
+
   // ----- ゲーム開始 -----
 
   function startGame(opts) {
-    // opts: { rows, cols, numPlayers, isPoint, isBumpy }
-    const blockedSet = opts.isBumpy ? genBlockedCells(opts.rows, opts.cols) : null;
+    // opts: { rows, cols, numPlayers, isPoint, isBumpy, blockedSet?, pointGrid?, cpu? }
+    const blockedSet = opts.blockedSet || (opts.isBumpy ? genBlockedCells(opts.rows, opts.cols) : null);
     const initialBoard = buildInitialBoard(opts.rows, opts.cols, blockedSet);
-    const pointGrid = opts.isPoint ? genPointGrid(opts.rows, opts.cols, blockedSet) : null;
+    const pointGrid = opts.pointGrid || (opts.isPoint ? genPointGrid(opts.rows, opts.cols, blockedSet) : null);
     state.game = {
       rows: opts.rows,
       cols: opts.cols,
@@ -718,20 +987,34 @@
       isBumpy: opts.isBumpy,
       initialBoard,
       pointGrid,
+      cpu: opts.cpu || null,  // { difficulty, playerIdx }
     };
     state.history = [];
     state.cursor = 0;
     state.showOverlay = false;
     state.lastAnimateIndex = -1;
+    state.cpuThinking = false;
     state.screen = 'game';
     render();
+    scheduleCpuTurnIfNeeded();
+  }
+
+  function buildCpuOpt(numPlayers) {
+    if (!state.cpuConfig.enabled) return null;
+    if (numPlayers !== 2) return null;
+    return { difficulty: state.cpuConfig.difficulty, playerIdx: 1 };
   }
 
   function startBasic() {
-    startGame({ rows: 6, cols: 7, numPlayers: 2, isPoint: false, isBumpy: false });
+    startGame({
+      rows: 6, cols: 7, numPlayers: 2,
+      isPoint: false, isBumpy: false,
+      cpu: buildCpuOpt(2),
+    });
   }
 
   function startArrange() {
+    ensurePreview();
     const size = FIELD_SIZES[state.config.sizeIdx];
     startGame({
       rows: size.rows,
@@ -739,7 +1022,24 @@
       numPlayers: state.config.numPlayers,
       isPoint: state.config.isPoint,
       isBumpy: state.config.isBumpy,
+      blockedSet: state.preview.blockedSet,
+      pointGrid: state.preview.pointGrid,
+      cpu: buildCpuOpt(state.config.numPlayers),
     });
+  }
+
+  // ----- アレンジパネル用 ライブプレビューのキャッシュ -----
+  function ensurePreview() {
+    const cfg = state.config;
+    const sig = cfg.sizeIdx + ':' + (cfg.isPoint ? 1 : 0) + ':' + (cfg.isBumpy ? 1 : 0);
+    if (state.preview.signature === sig) return;
+    const size = FIELD_SIZES[cfg.sizeIdx];
+    state.preview.signature = sig;
+    state.preview.blockedSet = cfg.isBumpy ? genBlockedCells(size.rows, size.cols) : null;
+    state.preview.pointGrid = cfg.isPoint ? genPointGrid(size.rows, size.cols, state.preview.blockedSet) : null;
+  }
+  function invalidatePreview() {
+    state.preview.signature = '';
   }
 
   function backToTitle() {
@@ -764,12 +1064,12 @@
     });
   }
 
-  function tryDrop(col) {
+  function doDrop(col) {
     const gs = computeGameStateAt(state.cursor);
-    if (gs.gameOver) return;
+    if (gs.gameOver) return false;
     const board = gs.board;
     const row = findLandingRow(board, col, state.game.rows);
-    if (row < 0) return;
+    if (row < 0) return false;
 
     state.history = state.history.slice(0, state.cursor);
     const playerIdx = state.cursor % state.game.numPlayers;
@@ -781,6 +1081,41 @@
     const winInfo = checkWinAt(newBoard, row, col, state.game.rows, state.game.cols);
     state.showOverlay = !!winInfo || noValidMoves(newBoard, state.game.rows, state.game.cols);
     render();
+    scheduleCpuTurnIfNeeded();
+    return true;
+  }
+
+  function tryDrop(col) {
+    if (!state.game) return;
+    if (state.cpuThinking) return;
+    const gs = computeGameStateAt(state.cursor);
+    if (gs.gameOver) return;
+    // CPU の手番中はクリックを無視
+    if (state.game.cpu && gs.currentPlayerIdx === state.game.cpu.playerIdx) return;
+    doDrop(col);
+  }
+
+  function scheduleCpuTurnIfNeeded() {
+    if (!state.game || !state.game.cpu) return;
+    const gs = computeGameStateAt(state.cursor);
+    if (gs.gameOver) return;
+    if (gs.currentPlayerIdx !== state.game.cpu.playerIdx) return;
+    state.cpuThinking = true;
+    render();
+    setTimeout(() => {
+      if (!state.game || state.screen !== 'game') { state.cpuThinking = false; return; }
+      const gs2 = computeGameStateAt(state.cursor);
+      if (gs2.gameOver || gs2.currentPlayerIdx !== state.game.cpu.playerIdx) {
+        state.cpuThinking = false; render(); return;
+      }
+      const col = pickCpuMove(
+        gs2.board, state.game.rows, state.game.cols,
+        state.game.cpu.playerIdx, state.game.numPlayers, state.game.cpu.difficulty
+      );
+      state.cpuThinking = false;
+      if (col != null) doDrop(col);
+      else render();
+    }, 550);
   }
 
   function goBack() {
@@ -882,8 +1217,9 @@
             el('div', {class: 'dot', style: {background: getTheme().pieces[1]}}),
           ]),
           el('div', {class: 'name'}, [
-            el('div', {}, 'ベーシックルール'),
-            el('div', {class: 'desc'}, '1対1 / 7×6 の標準コネクトフォー'),
+            el('div', {}, 'ベーシックルール' + (state.cpuConfig.enabled ? ' 🤖' : '')),
+            el('div', {class: 'desc'},
+              '1対1 / 7×6 の標準コネクトフォー' + (state.cpuConfig.enabled ? '（CPU対戦）' : '')),
           ]),
         ]),
         // アレンジルール
@@ -905,6 +1241,8 @@
         // アレンジパネル
         state.arrangeOpen ? renderArrangePanel() : null,
       ]),
+      // CPU戦設定
+      renderCpuSection(),
       // 配色テーマ（一番下）
       renderThemeSection(),
     ]);
@@ -912,6 +1250,7 @@
 
   function renderArrangePanel() {
     const cfg = state.config;
+    ensurePreview();
     return el('div', {class: 'arrange-panel'}, [
       // ポイント制
       el('div', {class: 'arrange-row'}, [
@@ -937,7 +1276,7 @@
           }),
           el('span', {class: 'arrange-label'}, [
             '凸凹フィールド戦 ',
-            el('span', {class: 'hint'}, '障害マスありの盤面')
+            el('span', {class: 'hint'}, '障害マスは通り抜け／玉は最下段から積む')
           ])
         ]),
       ]),
@@ -946,7 +1285,7 @@
         el('span', {class: 'arrange-label'}, 'フィールドの広さ'),
         el('select', {
           class: 'arrange-select',
-          onchange: (e) => { cfg.sizeIdx = parseInt(e.target.value, 10); render(); }
+          onchange: (e) => { cfg.sizeIdx = parseInt(e.target.value, 10); invalidatePreview(); render(); }
         }, FIELD_SIZES.map((s, i) =>
           el('option', { value: String(i), selected: cfg.sizeIdx === i }, s.label)
         )),
@@ -961,8 +1300,106 @@
           el('option', { value: String(p.value), selected: cfg.numPlayers === p.value }, p.label)
         )),
       ]),
+      // ライブプレビュー
+      renderArrangePreview(),
       // 対戦開始
       el('button', {class: 'arrange-start', onclick: startArrange}, '対戦開始'),
+    ]);
+  }
+
+  function renderArrangePreview() {
+    const cfg = state.config;
+    const size = FIELD_SIZES[cfg.sizeIdx];
+    const theme = getTheme();
+    const cellSize = 38;
+    const padding = 6;
+    const width = size.cols * cellSize + padding * 2;
+    const height = size.rows * cellSize + padding * 2;
+
+    const svg = svgEl('svg', {
+      class: 'preview-svg',
+      viewBox: '0 0 ' + width + ' ' + height,
+      preserveAspectRatio: 'xMidYMid meet'
+    });
+    svg.appendChild(svgEl('rect', { x: 0, y: 0, width, height, rx: 10, fill: theme.board }));
+
+    for (let r = 0; r < size.rows; r++) {
+      for (let c = 0; c < size.cols; c++) {
+        const cx = padding + c * cellSize + cellSize / 2;
+        const cy = padding + r * cellSize + cellSize / 2;
+        const radius = cellSize * 0.42;
+        const isBlocked = state.preview.blockedSet && state.preview.blockedSet.has(r + ',' + c);
+
+        if (isBlocked) {
+          svg.appendChild(svgEl('rect', {
+            x: padding + c * cellSize + 3,
+            y: padding + r * cellSize + 3,
+            width: cellSize - 6, height: cellSize - 6,
+            rx: 5, fill: '#475569', stroke: '#1e293b', 'stroke-width': 1.2
+          }));
+          svg.appendChild(svgEl('text', {
+            x: cx, y: cy + cellSize * 0.18, 'text-anchor': 'middle',
+            'font-size': cellSize * 0.55, fill: 'rgba(255,255,255,0.78)',
+            'font-weight': 'bold', 'font-family': 'sans-serif'
+          }, '×'));
+        } else {
+          svg.appendChild(svgEl('circle', { cx, cy, r: radius, fill: theme.cell }));
+          if (cfg.isPoint && state.preview.pointGrid) {
+            const v = state.preview.pointGrid[r][c];
+            if (v != null) {
+              svg.appendChild(svgEl('text', {
+                x: cx, y: cy + cellSize * 0.08, 'text-anchor': 'middle',
+                'font-size': cellSize * 0.30, 'font-weight': 'bold',
+                fill: v > 0 ? '#15803d' : (v < 0 ? '#b91c1c' : '#64748b'),
+                'font-family': 'sans-serif'
+              }, (v > 0 ? '+' : '') + v));
+            }
+          }
+        }
+      }
+    }
+
+    let label = '盤面プレビュー（' + size.cols + '×' + size.rows + '）';
+    const tags = [];
+    if (cfg.isPoint) tags.push('ポイント制');
+    if (cfg.isBumpy) tags.push('凸凹');
+    if (tags.length) label += ' / ' + tags.join(' + ');
+
+    return el('div', {class: 'arrange-preview'}, [
+      el('div', {class: 'preview-label'}, label),
+      svg,
+    ]);
+  }
+
+  function renderCpuSection() {
+    const cpu = state.cpuConfig;
+    return el('div', {class: 'cpu-section'}, [
+      el('div', {class: 'cpu-row'}, [
+        el('label', {class: 'checkbox'}, [
+          el('input', {
+            type: 'checkbox',
+            checked: cpu.enabled,
+            onchange: (e) => { cpu.enabled = e.target.checked; render(); }
+          }),
+          el('span', {class: 'cpu-title'}, [
+            el('span', {class: 'robo'}, '🤖'),
+            'CPUと対戦する',
+          ]),
+        ]),
+      ]),
+      cpu.enabled ? el('div', {class: 'diff-row'}, [
+        el('span', {class: 'diff-label'}, '難易度'),
+        ...DIFFICULTIES.map(d =>
+          el('button', {
+            class: 'diff-btn' + (cpu.difficulty === d.value ? ' selected' : ''),
+            onclick: () => { cpu.difficulty = d.value; render(); },
+            title: d.desc,
+          }, d.label)
+        ),
+      ]) : null,
+      cpu.enabled ? el('p', {class: 'cpu-note'},
+        '※ アレンジルールでは「2人」を選んだ場合のみCPUが入ります（3人以上は人間どうし対戦）'
+      ) : null,
     ]);
   }
 
@@ -1004,10 +1441,13 @@
     if (g.isBumpy) parts.push('凸凹');
     if (g.numPlayers >= 3) parts.push(g.numPlayers + '人戦');
     if (parts.length === 0) parts.push('基本ルール');
+    if (g.cpu) parts.push('vs CPU(' + g.cpu.difficulty.toUpperCase() + ')');
     return parts.join(' + ') + ' / ' + g.cols + '×' + g.rows;
   }
 
   function playerName(idx) {
+    if (state.game && state.game.cpu && idx === state.game.cpu.playerIdx) return 'CPU';
+    if (state.game && state.game.cpu && state.game.numPlayers === 2) return 'あなた';
     return 'P' + (idx + 1);
   }
   function playerColor(idx) {
@@ -1027,10 +1467,12 @@
         ];
       }
     } else {
+      const isCpuTurn = state.game.cpu && gs.currentPlayerIdx === state.game.cpu.playerIdx;
       leftContent = [
         el('span', {style: {color: 'var(--text-muted)'}}, '手番'),
         el('div', {class: 'dot', style: {background: playerColor(gs.currentPlayerIdx)}}),
-        el('span', {}, playerName(gs.currentPlayerIdx))
+        el('span', {}, playerName(gs.currentPlayerIdx) + (isCpuTurn ? '（CPU）' : '')),
+        state.cpuThinking ? el('span', {class: 'cpu-thinking-tag'}, '🤖 考え中…') : null,
       ];
     }
 
@@ -1143,12 +1585,24 @@
                                 state.history[state.lastAnimateIndex].col === c;
             const lightPiece = isLightColor(color);
 
+            // 白玉などの明るい玉は二重リング+影で視認性を確保
+            if (lightPiece && !isWin) {
+              svg.appendChild(svgEl('circle', {
+                cx, cy, r: radius * 0.99,
+                fill: 'none',
+                stroke: '#1e293b',
+                'stroke-width': 2.5,
+              }));
+            }
+
             const disc = svgEl('circle', {
-              cx, cy, r: radius * 0.94,
+              cx, cy, r: radius * 0.92,
               fill: color,
-              stroke: isWin ? '#10b981' : (lightPiece ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.22)'),
-              'stroke-width': isWin ? 5 : (lightPiece ? 3 : 2.5),
-              style: isWin ? 'filter: drop-shadow(0 0 8px #10b981);' : ''
+              stroke: isWin ? '#10b981' : (lightPiece ? '#0f172a' : 'rgba(0,0,0,0.32)'),
+              'stroke-width': isWin ? 5 : (lightPiece ? 3 : 2.2),
+              style: isWin
+                ? 'filter: drop-shadow(0 0 10px #10b981);'
+                : (lightPiece ? 'filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45));' : '')
             });
 
             if (lastDropped) {
