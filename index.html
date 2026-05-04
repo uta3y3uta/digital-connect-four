@@ -584,29 +584,40 @@
   const EMPTY = -1;
   const BLOCKED = -2;
 
-  // ----- 配色テーマ（10種・全て背景色が異なる） -----
+  // ----- 配色テーマ（10種・背景色も玉色も全てかぶらない） -----
   // pieces[0..n-1] が各プレイヤーの色（最大8人想定）
   const THEMES = [
+    // ゴールド：金細工。リッチゴールド背景＋ネイビー盤＋濃ゴールドのマス
     { name: 'ゴールド',    bg: '#fbbf24', board: '#1e3a8a', cell: '#c9971a', text: '#3b1f00',
       pieces: ['#ffffff', '#dc2626', '#2563eb', '#15803d', '#7c3aed', '#f97316', '#0f172a', '#ec4899'] },
-    { name: 'ネイビー',    bg: '#1e3a8a', board: '#fbbf24', cell: '#fef3c7', text: '#f1f5f9',
-      pieces: ['#ffffff', '#dc2626', '#0ea5e9', '#22c55e', '#a855f7', '#f97316', '#0f172a', '#ec4899'] },
-    { name: 'ミント',      bg: '#a7f3d0', board: '#065f46', cell: '#ecfdf5', text: '#064e3b',
-      pieces: ['#ffffff', '#dc2626', '#facc15', '#0ea5e9', '#a855f7', '#f97316', '#0f172a', '#ec4899'] },
+    // ロイヤル：紺＋金。王室感。玉=赤×濃藍
+    { name: 'ロイヤル',    bg: '#1e3a8a', board: '#fbbf24', cell: '#fef3c7', text: '#f8fafc',
+      pieces: ['#dc2626', '#1e1b4b', '#16a34a', '#c026d3', '#f97316', '#0ea5e9', '#ffffff', '#facc15'] },
+    // ミント：清涼感。玉=白×コーラル
+    { name: 'ミント',      bg: '#a7f3d0', board: '#064e3b', cell: '#ecfdf5', text: '#022c22',
+      pieces: ['#ffffff', '#fb7185', '#facc15', '#2563eb', '#c026d3', '#f97316', '#0f172a', '#4c1d95'] },
+    // ピーチ：ぬくもり夕日色。玉=黒×深緑
     { name: 'ピーチ',      bg: '#fed7aa', board: '#7c2d12', cell: '#fff7ed', text: '#431407',
-      pieces: ['#ffffff', '#0f172a', '#dc2626', '#facc15', '#22c55e', '#0ea5e9', '#a855f7', '#ec4899'] },
+      pieces: ['#0f172a', '#15803d', '#c026d3', '#2563eb', '#ffffff', '#facc15', '#ec4899', '#6d28d9'] },
+    // ラベンダー：藤色。玉=黄×緑（補色のコントラスト）
     { name: 'ラベンダー',  bg: '#ddd6fe', board: '#5b21b6', cell: '#f5f3ff', text: '#3b0764',
-      pieces: ['#ffffff', '#facc15', '#dc2626', '#22c55e', '#0ea5e9', '#f97316', '#0f172a', '#ec4899'] },
-    { name: 'シアン',      bg: '#67e8f9', board: '#155e75', cell: '#ecfeff', text: '#083344',
-      pieces: ['#ffffff', '#dc2626', '#facc15', '#22c55e', '#a855f7', '#f97316', '#0f172a', '#ec4899'] },
-    { name: 'チェリー',    bg: '#fda4af', board: '#9f1239', cell: '#fff1f2', text: '#4c0519',
-      pieces: ['#ffffff', '#1e3a8a', '#facc15', '#22c55e', '#0ea5e9', '#a855f7', '#0f172a', '#f97316'] },
-    { name: 'モス',        bg: '#bef264', board: '#3f6212', cell: '#f7fee7', text: '#1a2e05',
-      pieces: ['#ffffff', '#dc2626', '#0f172a', '#0ea5e9', '#a855f7', '#f97316', '#facc15', '#ec4899'] },
+      pieces: ['#facc15', '#16a34a', '#ffffff', '#dc2626', '#0ea5e9', '#fb7185', '#0f172a', '#f97316'] },
+    // アクア：明るい水色。玉=白×マゼンタ（ネオン感）
+    { name: 'アクア',      bg: '#22d3ee', board: '#155e75', cell: '#ecfeff', text: '#083344',
+      pieces: ['#ffffff', '#c026d3', '#facc15', '#16a34a', '#f97316', '#7c3aed', '#0f172a', '#f43f5e'] },
+    // チェリー：桜～ワイン。玉=白×ネイビー
+    { name: 'チェリー',    bg: '#fda4af', board: '#881337', cell: '#fff1f2', text: '#4c0519',
+      pieces: ['#ffffff', '#1e3a8a', '#facc15', '#16a34a', '#f97316', '#0f172a', '#c026d3', '#06b6d4']
+    },
+    // リーフ：若葉。玉=ネイビー×白
+    { name: 'リーフ',      bg: '#bef264', board: '#365314', cell: '#f7fee7', text: '#1a2e05',
+      pieces: ['#1e3a8a', '#ffffff', '#dc2626', '#f97316', '#c026d3', '#0f172a', '#fbbf24', '#06b6d4'] },
+    // シルバー：銀＋墨。モダン。玉=赤×ネイビー
     { name: 'シルバー',    bg: '#cbd5e1', board: '#1e293b', cell: '#ffffff', text: '#0f172a',
-      pieces: ['#ffffff', '#dc2626', '#facc15', '#22c55e', '#0ea5e9', '#a855f7', '#f97316', '#0f172a'] },
+      pieces: ['#dc2626', '#1e3a8a', '#facc15', '#16a34a', '#c026d3', '#f97316', '#0f172a', '#06b6d4'] },
+    // ナイト：夜空＋ネオン。玉=白×ネオンピンク
     { name: 'ナイト',      bg: '#0f172a', board: '#475569', cell: '#1e293b', text: '#f8fafc',
-      pieces: ['#ffffff', '#ef4444', '#fbbf24', '#34d399', '#22d3ee', '#c084fc', '#fb923c', '#f472b6'] },
+      pieces: ['#ffffff', '#f472b6', '#fbbf24', '#34d399', '#22d3ee', '#c084fc', '#fb923c', '#f43f5e'] },
   ];
 
   // ----- フィールドサイズ・人数の選択肢 -----
